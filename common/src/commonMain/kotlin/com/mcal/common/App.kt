@@ -64,11 +64,11 @@ fun CodeEditor(modifier: Modifier = Modifier) {
                         .selectable(
                             selected = true,
                             onClick = {
-                                showSmaliCodeDialog("$tabName.smali", classTree!!.getSmali(item.classDef!!))
+                                showSmaliCodeDialog(tabName, classTree!!.getSmali(item.classDef!!))
                             }
                         ),
                 ) {
-                    Text(modifier = Modifier.padding(8.dp), text = "$tabName.smali")
+                    Text(modifier = Modifier.padding(8.dp), text = tabName)
                 }
             })
         }
@@ -78,14 +78,6 @@ fun CodeEditor(modifier: Modifier = Modifier) {
             onValueChange = { newText -> smaliCode.value = newText },
             placeholder = { Text("") }
         )
-//        Button(modifier = Modifier.fillMaxWidth(),
-//            onClick = {
-//                CoroutineScope(Dispatchers.IO).launch {
-//                   classTree?.saveDexFile()
-//                }
-//            }) {
-//            Text("Save")
-//        }
     }
 }
 
