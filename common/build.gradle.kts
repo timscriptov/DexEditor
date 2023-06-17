@@ -26,6 +26,14 @@ kotlin {
                 implementation("org.smali:dexlib2:2.5.2")
                 implementation("org.smali:smali:2.5.2")
                 implementation("org.smali:baksmali:2.5.2")
+
+                implementation("io.github.skylot:jadx-core:1.4.7")
+                implementation("io.github.skylot:jadx-dex-input:1.4.7")
+                implementation("io.github.skylot:jadx-java-convert:1.4.7")
+                implementation("io.github.skylot:jadx-java-input:1.4.7")
+                implementation("io.github.skylot:jadx-smali-input:1.4.7")
+                implementation("io.github.skylot:jadx-plugins-api:1.4.7")
+                implementation("io.github.skylot:jadx-raung-input:1.4.7")
             }
         }
         val commonTest by getting {

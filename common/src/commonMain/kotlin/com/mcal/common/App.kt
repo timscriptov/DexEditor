@@ -15,8 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
-import com.mcal.common.ui.showSmaliCodeDialog
-import com.mcal.common.ui.smaliCode
+import com.mcal.common.utils.JaDXHelper
 import com.mcal.dexlib.ClassTree
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,8 +29,11 @@ var classTree: ClassTree? = null
 val classList = mutableStateListOf<ClassItem>()
 var currenPath = mutableStateOf("")
 var dexPath = mutableStateOf("C:\\Users\\timscriptov\\Desktop\\classes.dex")
-
+var showSmaliCode = mutableStateOf(true)
 val openedFiles = mutableStateListOf<ClassItem>()
+
+val javaCode = mutableStateOf("")
+var smaliCode = mutableStateOf("")
 
 @Composable
 fun App() {
@@ -57,33 +59,70 @@ fun CodeEditor(modifier: Modifier = Modifier) {
     ) {
         LazyRow(modifier = Modifier.fillMaxWidth()) {
             items(items = openedFiles, itemContent = { item ->
-                val tabName = item.name + ".smali"
-                Card(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .selectable(
-                            selected = true,
-                            onClick = {
-                                showSmaliCodeDialog(tabName, classTree!!.getSmali(item.classDef!!))
-                            }
-                        ),
+                val smaliName = item.name
+                val tabName = "$smaliName.smali"
+
+                Button(
+                    modifier = Modifier.fillMaxWidth().padding(start = 2.dp, bottom = 2.dp),
+                    onClick = {
+                        smaliCode.value = classTree!!.getSmali(item.classDef!!)
+                    }
                 ) {
-                    Text(modifier = Modifier.padding(8.dp), text = tabName)
+                    Text(tabName)
                 }
             })
         }
-        TextField(
-            modifier = Modifier.fillMaxSize().weight(1f),
-            value = smaliCode.value,
-            onValueChange = { newText -> smaliCode.value = newText },
-            placeholder = { Text("") }
-        )
+        if (showSmaliCode.value) {
+            TextField(
+                modifier = Modifier.fillMaxSize().weight(1f),
+                value = smaliCode.value,
+                onValueChange = { newText -> smaliCode.value = newText },
+                placeholder = { Text("") }
+            )
+        } else {
+            TextField(
+                modifier = Modifier.fillMaxSize().weight(1f),
+                value = javaCode.value,
+                onValueChange = { newText -> javaCode.value = newText },
+                placeholder = { Text("") }
+            )
+        }
+        LazyRow(modifier = Modifier.fillMaxWidth()) {
+            item {
+                Button(
+                    modifier = Modifier.fillMaxWidth().padding(start = 2.dp, bottom = 2.dp),
+                    onClick = {
+                        showSmaliCode.value = true
+                    }
+                ) {
+                    Text("Smali")
+                }
+            }
+            item {
+                Button(
+                    modifier = Modifier.fillMaxWidth().padding(start = 2.dp, bottom = 2.dp),
+                    onClick = {
+                        showSmaliCode.value = false
+                        javaCode.value = JaDXHelper.smali2java(smaliCode.value)
+                    }
+                ) {
+                    Text("Java")
+                }
+            }
+        }
     }
 }
 
 @Composable
 fun PackageList() {
     Text(currenPath.value)
+
+    if (currenPath.value.isNotEmpty()) {
+        classTree?.let {
+            BackItem(it)
+        }
+    }
+
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         classList.forEach { item ->
             classTree?.let { classTree ->
@@ -139,7 +178,8 @@ fun InputFile(modifier: Modifier = Modifier) {
                         }
                     }
                 }
-            }) {
+            }
+        ) {
             Text("Decode")
         }
     }
@@ -149,12 +189,12 @@ fun InputFile(modifier: Modifier = Modifier) {
 fun FileItem(classTree: ClassTree, item: ClassItem) {
     Card(
         modifier = Modifier.fillMaxWidth()
-            .padding(8.dp)
+            .padding(top = 2.dp, bottom = 2.dp)
             .selectable(
                 selected = true,
                 onClick = {
                     openedFiles.add(item)
-                    showSmaliCodeDialog(item.name + ".smali", classTree.getSmali(item.classDef!!))
+                    smaliCode.value = classTree.getSmali(item.classDef!!)
                 }
             ),
     ) {
@@ -176,7 +216,7 @@ fun FileItem(classTree: ClassTree, item: ClassItem) {
 fun DirectoryItem(classTree: ClassTree, item: ClassItem) {
     Card(
         modifier = Modifier.fillMaxWidth()
-            .padding(8.dp)
+            .padding(top = 2.dp, bottom = 2.dp)
             .selectable(
                 selected = true,
                 onClick = {
@@ -209,6 +249,46 @@ fun DirectoryItem(classTree: ClassTree, item: ClassItem) {
                 tint = Color.Black
             )
             Text(modifier = Modifier.weight(1f), text = item.name)
+        }
+    }
+}
+
+@Composable
+fun BackItem(classTree: ClassTree) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+            .padding(top = 2.dp, bottom = 2.dp)
+            .selectable(
+                selected = true,
+                onClick = {
+                    val list = classTree.getList("../")
+                    val curPath = classTree.tree.curPath
+                    currenPath.value = curPath
+                    if (classList.isNotEmpty()) {
+                        classList.clear()
+                    }
+                    for (i in list.indices) {
+                        val path = list[i]
+                        if (classTree.tree.isDirectory(path)) {
+                            classList.add(ClassItem(path, null))
+                        } else {
+                            classList.add(ClassItem(path, classTree.classMap[curPath + path]))
+                        }
+                    }
+                }
+            ),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.padding(end = 8.dp),
+                bitmap = useResource("ic_folder.png") { loadImageBitmap(it) },
+                contentDescription = "Directory",
+                tint = Color.Black
+            )
+            Text(modifier = Modifier.weight(1f), text = "..")
         }
     }
 }
