@@ -12,9 +12,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.loadImageBitmap
+import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
-import com.mcal.common.resources.DirectoryIcon
-import com.mcal.common.resources.FileIcon
 import com.mcal.common.ui.showSmaliCodeDialog
 import com.mcal.common.ui.smaliCode
 import com.mcal.dexlib.ClassTree
@@ -163,9 +163,9 @@ fun FileItem(classTree: ClassTree, item: ClassItem) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = FileIcon,
+                bitmap = useResource("ic_file.png") { loadImageBitmap(it) },
                 contentDescription = "File",
-                tint = Color.Black
+                tint = Color.Blue
             )
             Text(modifier = Modifier.weight(1f), text = item.name + ".smali")
         }
@@ -204,7 +204,7 @@ fun DirectoryItem(classTree: ClassTree, item: ClassItem) {
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
-                imageVector = DirectoryIcon,
+                bitmap = useResource("ic_folder.png") { loadImageBitmap(it) },
                 contentDescription = "Directory",
                 tint = Color.Black
             )
