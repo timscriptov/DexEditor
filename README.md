@@ -2,7 +2,7 @@
 
 Не большая реализация просмотра пакетов, и smali кода в dex файлах.
 
-## Project for IntelliJ IDEA
+### Project for IntelliJ IDEA
 Jetpack Compose 1.4.0
 
 Kotlin 1.8.20

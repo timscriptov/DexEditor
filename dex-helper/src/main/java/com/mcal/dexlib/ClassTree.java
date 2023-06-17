@@ -267,6 +267,35 @@ public class ClassTree {
         classMap.put(type, classDef);
     }
 
+    public void saveDexFile(String destPath) {
+        DexPool dexpool = new DexPool(Opcodes.getDefault());
+        try {
+            int index = 0;
+            for (String type : classMap.keySet()) {
+                ClassDef classDef = classMap.get(type);
+                dexpool.internClass(classDef);
+                index++;
+            }
+
+            MemoryDataStore memoryDataStore = new MemoryDataStore();
+            dexpool.writeTo(memoryDataStore);
+            byte[] result = Arrays.copyOf(memoryDataStore.getBuffer(), memoryDataStore.getSize());
+
+            File file = new File(destPath);
+
+            if (file.renameTo(file)) {
+                file. delete();
+                saveFile(result, destPath);
+            }
+            data = result;
+//            isChanged = false;
+//            isSaved = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public void saveDexFile(@NotNull String destPath, @NotNull DexSaveProgress dexSaveProgress) {
         DexBuilder dexbuilder = new DexBuilder(Opcodes.getDefault());
 
@@ -318,7 +347,6 @@ public class ClassTree {
                 saveFile(result, destPath);
             }
             data = result;
-            // TODO
 //            isChanged = false;
 //            isSaved = true;
         } catch (Exception e) {
