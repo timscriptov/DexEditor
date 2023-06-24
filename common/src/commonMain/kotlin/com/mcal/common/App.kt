@@ -66,6 +66,7 @@ fun CodeEditor(modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth().padding(start = 2.dp, bottom = 2.dp),
                     onClick = {
                         smaliCode.value = classTree!!.getSmali(item.classDef!!)
+                        javaCode.value = JaDXHelper.smali2java(smaliCode.value)
                     }
                 ) {
                     Text(tabName)
@@ -84,7 +85,8 @@ fun CodeEditor(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxSize().weight(1f),
                 value = javaCode.value,
                 onValueChange = { newText -> javaCode.value = newText },
-                placeholder = { Text("") }
+                placeholder = { Text("") },
+                enabled = false
             )
         }
         LazyRow(modifier = Modifier.fillMaxWidth()) {
@@ -103,7 +105,6 @@ fun CodeEditor(modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxWidth().padding(start = 2.dp, bottom = 2.dp),
                     onClick = {
                         showSmaliCode.value = false
-                        javaCode.value = JaDXHelper.smali2java(smaliCode.value)
                     }
                 ) {
                     Text("Java")
@@ -195,6 +196,7 @@ fun FileItem(classTree: ClassTree, item: ClassItem) {
                 onClick = {
                     openedFiles.add(item)
                     smaliCode.value = classTree.getSmali(item.classDef!!)
+                    javaCode.value = JaDXHelper.smali2java(smaliCode.value)
                 }
             ),
     ) {
